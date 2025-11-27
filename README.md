@@ -29,7 +29,7 @@ A comprehensive AI-powered career guidance web platform designed for Indian stud
 - FastAPI web framework
 - Langchain for AI orchestration
 - Google Generative AI (Gemini)
-- MySQL database
+- MongoDB database
 - Pydantic for data validation
 - CORS middleware
 
@@ -67,7 +67,7 @@ Prism/
 ### Prerequisites
 - Node.js 18+ and npm
 - Python 3.9+
-- MySQL 8.0+
+- MongoDB (Local or Atlas)
 - Google API Key (Gemini)
 - Firebase project
 
@@ -100,13 +100,13 @@ pip install -r requirements.txt
 cp .env.example .env
 
 # Edit .env and add your credentials
-# Required: GOOGLE_API_KEY, DB_* variables
+# Required: GOOGLE_API_KEY, MONGODB_URI
 ```
 
-5. **Setup MySQL Database:**
-   - Create a MySQL database named `prism_careers`
-   - Update database credentials in `.env` file
-   - The application will create necessary tables on first run
+5. **Setup MongoDB Database:**
+   - **Local:** Ensure MongoDB is running locally. Default URI: `mongodb://localhost:27017/`
+   - **Atlas:** Create a cluster, get the connection string, and update `MONGODB_URI` in `.env`.
+   - The application will create necessary collections on first run.
 
 6. **Get Google API Key:**
    - Visit https://makersuite.google.com/app/apikey
@@ -162,10 +162,7 @@ Frontend will run at: http://localhost:5173
 ```env
 # Required
 GOOGLE_API_KEY=your_google_api_key_here
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_database_password
+MONGODB_URI=mongodb://localhost:27017/
 DB_NAME=prism_careers
 
 # Optional - Email notifications
@@ -203,7 +200,12 @@ VITE_API_URL=http://localhost:8000
    - Update CORS settings in `main.py` to allow your frontend domain
    - Set `HOST=0.0.0.0` and appropriate `PORT` in environment variables
 
-2. **Deploy:**
+2. **Database (MongoDB Atlas):**
+   - Create a free cluster on [MongoDB Atlas](https://www.mongodb.com/atlas/database)
+   - Whitelist `0.0.0.0/0` (or your server IP) in Network Access
+   - Get the connection string (SRV) and set it as `MONGODB_URI` in your deployment platform variables
+
+3. **Deploy:**
    ```bash
    # For Railway/Render, push to your repository
    git push origin main
@@ -212,9 +214,10 @@ VITE_API_URL=http://localhost:8000
    # Make sure to set all environment variables in platform dashboard
    ```
 
-3. **Required Environment Variables on Platform:**
+4. **Required Environment Variables on Platform:**
    - `GOOGLE_API_KEY`
-   - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
+   - `MONGODB_URI`
+   - `DB_NAME` (optional, defaults to prism_careers)
    - `SMTP_SERVER`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` (optional)
 
 ### Frontend Deployment (Vercel/Netlify)
@@ -247,12 +250,12 @@ VITE_API_URL=http://localhost:8000
 
 - [ ] All environment variables are set (no hardcoded secrets)
 - [ ] CORS is configured for your frontend domain
-- [ ] Database is accessible from backend server
+- [ ] Database is accessible from backend server (MongoDB Atlas Network Access)
 - [ ] Firebase authentication is configured
 - [ ] Google API key has proper quotas set
 - [ ] SSL/HTTPS is enabled
 - [ ] Error logging is configured
-- [ ] Database backups are scheduled
+- [ ] Database backups are scheduled (Auto-managed by Atlas)
 
 ## 📡 API Endpoints
 
@@ -297,7 +300,7 @@ VITE_API_URL=http://localhost:8000
 - **AI Analysis**: Gemini AI processes responses
 - **JSON Responses**: Structured career recommendations
 - **Context-Aware Chat**: Personalized mentor responses
-- **Database Integration**: MySQL for data persistence
+- **Database Integration**: MongoDB for data persistence
 - **Email Notifications**: Career request notifications
 
 ## 🔐 Security
@@ -306,7 +309,7 @@ VITE_API_URL=http://localhost:8000
 - Environment variables for sensitive data
 - CORS configuration for API security
 - Input validation with Pydantic
-- SQL injection prevention with parameterized queries
+- NoSQL injection prevention (using ODM/ORM patterns)
 - API key protection (never commit to git)
 
 ## 🛠️ Development Tips
@@ -322,7 +325,7 @@ VITE_API_URL=http://localhost:8000
    - Test responsive design at different breakpoints
 
 3. **Database:**
-   - Use MySQL Workbench or similar for database management
+   - Use MongoDB Compass for database management
    - Backup database regularly during development
    - Check connection settings if errors occur
 
