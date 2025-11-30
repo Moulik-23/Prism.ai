@@ -1,4 +1,4 @@
-# Have a lool at a application
+# Have a look at a application
 https://prism-ai-iota.vercel.app/
 # 🎓 Prism - AI Career Guidance Platform
 
