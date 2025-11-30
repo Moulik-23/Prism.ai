@@ -1,3 +1,5 @@
+# Have a lool at a application
+https://prism-ai-iota.vercel.app/
 # 🎓 Prism - AI Career Guidance Platform
 
 A comprehensive AI-powered career guidance web platform designed for Indian students. Provides personalized career advice, skills gap analysis, and 24/7 mentorship through intelligent chatbot powered by Google Gemini AI.
