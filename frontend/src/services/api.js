@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/' : 'http://localhost:8000');
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -15,7 +15,7 @@ export const assessmentAPI = {
     const response = await api.get('/api/assessment/questions');
     return response.data;
   },
-  
+
   submitAssessment: async (userId, answers, userProfile = null) => {
     const response = await api.post('/api/assessment/submit', {
       user_id: userId,
@@ -45,7 +45,7 @@ export const mentorAPI = {
     });
     return response.data;
   },
-  
+
   getChatHistory: async (userId, limit = 20) => {
     const response = await api.get(`/api/mentor/chat/history/${userId}`, {
       params: { limit },
@@ -63,14 +63,14 @@ export const jobsAPI = {
     const response = await api.get('/api/jobs', { params });
     return response.data;
   },
-  
+
   searchIndeed: async (jobTitle, location = 'India', limit = 10) => {
     const response = await api.get('/api/jobs/indeed-search', {
       params: { job_title: jobTitle, location, limit },
     });
     return response.data;
   },
-  
+
   applyToJob: async (firebaseUid, jobData) => {
     const response = await api.post('/api/jobs/apply', {
       firebase_uid: firebaseUid,
@@ -78,7 +78,7 @@ export const jobsAPI = {
     });
     return response.data;
   },
-  
+
   getMyApplications: async (firebaseUid) => {
     const response = await api.get(`/api/jobs/my-applications/${firebaseUid}`);
     return response.data;

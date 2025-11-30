@@ -40,7 +40,7 @@ const CareerJourney = () => {
   const [searchJobTitle, setSearchJobTitle] = useState('');
   const [searchLocation, setSearchLocation] = useState('India');
   const [showIndeedResults, setShowIndeedResults] = useState(false);
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/' : 'http://localhost:8000');
   const heroRef = useScrollAnimation();
 
   useEffect(() => {
@@ -53,11 +53,11 @@ const CareerJourney = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${API_URL}/api/career-journey/${currentUser.uid}`);
-      
+
       if (response.data.status === 'success' && response.data.career) {
         setCareer(response.data.career);
         setSelectedCareer(response.data.selected_career);
-        
+
         // Convert roadmap progress to object for easy lookup
         const progressMap = {};
         if (response.data.roadmap_progress && Array.isArray(response.data.roadmap_progress)) {
@@ -83,7 +83,7 @@ const CareerJourney = () => {
     const key = `${stage}_${stepId}`;
     const currentStatus = roadmapProgress[key] || false;
     const newStatus = !currentStatus;
-    
+
     try {
       const response = await axios.post(`${API_URL}/api/career-journey/roadmap/progress`, {
         firebase_uid: currentUser.uid,
@@ -93,14 +93,14 @@ const CareerJourney = () => {
         step_title: stepTitle,
         is_completed: newStatus
       });
-      
+
       if (response.data.status === 'success') {
         // Update local state immediately
         setRoadmapProgress(prev => ({
           ...prev,
           [key]: newStatus
         }));
-        
+
         // Verify save by refetching after a short delay
         setTimeout(() => {
           fetchCareerJourney();
@@ -160,7 +160,7 @@ const CareerJourney = () => {
         salary_range: job.salary_range,
         job_url: job.job_url
       });
-      
+
       alert('Application submitted successfully!');
       fetchApplications();
       fetchJobs(); // Refresh to show updated status
@@ -182,7 +182,7 @@ const CareerJourney = () => {
     try {
       const response = await jobsAPI.searchIndeed(searchJobTitle, searchLocation, 15);
       setIndeedJobs(response.jobs || []);
-      
+
       // Show helpful message if no jobs found
       if (response.jobs && response.jobs.length === 0 && response.message) {
         // Message will be displayed in the UI
@@ -216,7 +216,7 @@ const CareerJourney = () => {
         job_url: job.job_url,
         notes: `Applied via Indeed search`
       });
-      
+
       alert('Application recorded successfully!');
       fetchApplications();
     } catch (error) {
@@ -312,11 +312,10 @@ const CareerJourney = () => {
         <div className="mb-6 card-glass p-2 flex space-x-2" ref={heroRef.ref}>
           <button
             onClick={() => setCurrentView('roadmap')}
-            className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all ${
-              currentView === 'roadmap'
+            className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all ${currentView === 'roadmap'
                 ? 'bg-prism-gradient text-white shadow-prism-lg'
                 : 'text-gray-600 dark:text-gray-400 hover:bg-prism-violet/10 dark:hover:bg-prism-cyan/10'
-            }`}
+              }`}
           >
             <div className="flex items-center justify-center space-x-2">
               <Target className="h-5 w-5" />
@@ -325,11 +324,10 @@ const CareerJourney = () => {
           </button>
           <button
             onClick={() => setCurrentView('jobs')}
-            className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all ${
-              currentView === 'jobs'
+            className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all ${currentView === 'jobs'
                 ? 'bg-prism-gradient text-white shadow-prism-lg'
                 : 'text-gray-600 dark:text-gray-400 hover:bg-prism-violet/10 dark:hover:bg-prism-cyan/10'
-            }`}
+              }`}
             disabled={!isRoadmapComplete}
           >
             <div className="flex items-center justify-center space-x-2">
@@ -371,11 +369,11 @@ const CareerJourney = () => {
                   <Target className="h-5 w-5 text-prism-green mb-2" />
                   <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">Roadmap Progress</p>
                   <p className="font-bold text-gray-900 dark:text-white text-lg">
-                    {career.roadmap 
+                    {career.roadmap
                       ? `${career.roadmap.filter((_, idx) => {
-                          const key = `${career.roadmap[idx].stage}_step_${idx}`;
-                          return roadmapProgress[key] === true;
-                        }).length}/${career.roadmap.length} Steps`
+                        const key = `${career.roadmap[idx].stage}_step_${idx}`;
+                        return roadmapProgress[key] === true;
+                      }).length}/${career.roadmap.length} Steps`
                       : '0 Steps'}
                   </p>
                 </div>
@@ -398,23 +396,21 @@ const CareerJourney = () => {
                     // Use consistent key format that matches save/load
                     const stepKey = `${step.stage}_step_${idx}`;
                     const isCompleted = roadmapProgress[stepKey] === true || roadmapProgress[stepKey] === 1;
-                    
+
                     return (
                       <div key={idx} className="relative pl-10">
-                        <div className={`absolute left-0 top-0 w-8 h-8 rounded-full flex items-center justify-center shadow-prism ${
-                          isCompleted ? 'bg-prism-gradient' : 'bg-gray-300 dark:bg-gray-600'
-                        }`}>
+                        <div className={`absolute left-0 top-0 w-8 h-8 rounded-full flex items-center justify-center shadow-prism ${isCompleted ? 'bg-prism-gradient' : 'bg-gray-300 dark:bg-gray-600'
+                          }`}>
                           {isCompleted ? (
                             <CheckCircle className="h-5 w-5 text-white" />
                           ) : (
                             <Circle className="h-5 w-5 text-white" />
                           )}
                         </div>
-                        <div className={`card-glass rounded-xl p-4 border-l-4 ${
-                          isCompleted 
-                            ? 'border-prism-green bg-prism-green/5 dark:bg-prism-green/10' 
+                        <div className={`card-glass rounded-xl p-4 border-l-4 ${isCompleted
+                            ? 'border-prism-green bg-prism-green/5 dark:bg-prism-green/10'
                             : 'border-prism-violet/30 dark:border-prism-cyan/30 bg-prism-violet/5 dark:bg-prism-cyan/5'
-                        }`}>
+                          }`}>
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex-1">
                               <div className="flex items-center space-x-3 mb-2 flex-wrap">
@@ -440,11 +436,10 @@ const CareerJourney = () => {
                             </div>
                             <button
                               onClick={() => handleStepToggle(step.stage, `step_${idx}`, step.title, career.id)}
-                              className={`ml-4 p-3 rounded-xl transition-all shadow-prism ${
-                                isCompleted
+                              className={`ml-4 p-3 rounded-xl transition-all shadow-prism ${isCompleted
                                   ? 'bg-prism-green/20 hover:bg-prism-green/30 text-prism-green border-2 border-prism-green/30'
                                   : 'bg-gray-100 dark:bg-gray-700 hover:bg-prism-violet/20 dark:hover:bg-prism-cyan/20 text-gray-600 dark:text-gray-400 border-2 border-gray-200 dark:border-gray-600'
-                              }`}
+                                }`}
                               title={isCompleted ? 'Mark as incomplete' : 'Mark as complete'}
                             >
                               {isCompleted ? (
@@ -610,7 +605,7 @@ const CareerJourney = () => {
                     ) : indeedJobs.length > 0 ? (
                       <div className="space-y-4">
                         {indeedJobs.map((job, idx) => {
-                          const hasApplied = applications.some(app => 
+                          const hasApplied = applications.some(app =>
                             app.job_title === job.job_title && app.company_name === job.company_name
                           );
                           return (
@@ -673,11 +668,10 @@ const CareerJourney = () => {
                                   <button
                                     onClick={() => handleApplyIndeedJob(job)}
                                     disabled={hasApplied}
-                                    className={`px-4 py-2 rounded-xl font-semibold transition-all flex items-center ${
-                                      hasApplied
+                                    className={`px-4 py-2 rounded-xl font-semibold transition-all flex items-center ${hasApplied
                                         ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                                         : 'btn-primary'
-                                    }`}
+                                      }`}
                                   >
                                     {hasApplied ? (
                                       <>
@@ -730,7 +724,7 @@ const CareerJourney = () => {
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
                     Here are current job openings for {selectedCareer.career_title}. Click "Apply" to record your application.
                   </p>
-                  
+
                   {loadingJobs ? (
                     <div className="text-center py-8">
                       <Loader className="h-8 w-8 text-prism-violet dark:text-prism-cyan animate-spin mx-auto mb-2" />
@@ -810,11 +804,10 @@ const CareerJourney = () => {
                                 <button
                                   onClick={() => handleApplyJob(job)}
                                   disabled={hasApplied}
-                                  className={`px-4 py-2 rounded-xl font-semibold transition-all flex items-center ${
-                                    hasApplied
+                                  className={`px-4 py-2 rounded-xl font-semibold transition-all flex items-center ${hasApplied
                                       ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                                       : 'btn-primary'
-                                  }`}
+                                    }`}
                                 >
                                   {hasApplied ? (
                                     <>
@@ -866,12 +859,11 @@ const CareerJourney = () => {
                               )}
                             </div>
                             <div className="text-right">
-                              <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
-                                app.application_status === 'applied' ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-800' :
-                                app.application_status === 'interview' ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-800' :
-                                app.application_status === 'accepted' ? 'bg-prism-green/20 dark:bg-prism-green/10 text-prism-green border-prism-green/30' :
-                                'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
-                              }`}>
+                              <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${app.application_status === 'applied' ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-800' :
+                                  app.application_status === 'interview' ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-800' :
+                                    app.application_status === 'accepted' ? 'bg-prism-green/20 dark:bg-prism-green/10 text-prism-green border-prism-green/30' :
+                                      'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                                }`}>
                                 {app.application_status}
                               </span>
                               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
