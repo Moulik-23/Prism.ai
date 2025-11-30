@@ -6,20 +6,36 @@
         },
         {
             "src": "frontend/package.json",
-            "use": "@vercel/static-build",
-            "config": {
-                "distDir": "dist"
+            {
+                "builds": [
+                    {
+                        "src": "backend/app.py",
+                        "use": "@vercel/python"
+                    },
+                    {
+                        "src": "frontend/package.json",
+                        "use": "@vercel/static-build",
+                        "config": {
+                            "distDir": "dist"
+                        }
+                    }
+                ],
+                "rewrites": [
+                    {
+                        "source": "/api/(.*)",
+                        "destination": "/backend/app.py"
+                    },
+                    {
+                        "source": "/assets/(.*)",
+                        "destination": "/frontend/assets/$1"
+                    },
+                    {
+                        "source": "/(.*)\\.(ico|png|jpg|jpeg|svg|css|js|json)",
+                        "destination": "/frontend/$1.$2"
+                    },
+                    {
+                        "source": "/(.*)",
+                        "destination": "/frontend/index.html"
+                    }
+                ]
             }
-        }
-    ],
-    "rewrites": [
-        {
-            "source": "/api/(.*)",
-            "destination": "/backend/app.py"
-        },
-        {
-            "source": "/(.*)",
-            "destination": "/frontend/index.html"
-        }
-    ]
-}
